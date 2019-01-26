@@ -1,0 +1,49 @@
+<div class="row">
+  <nb-card>
+    <nb-card-body *ngIf="!loggedAs"
+      ><div>
+        <form (ngSubmit)="login()">
+          <div class="form-control-group">
+            <input
+              nbInput
+              fullWidth
+              [(ngModel)]="user.login"
+              placeholder="login"
+              autofocus
+              type="text"
+              name="login"
+            />
+          </div>
+          <div class="form-control-group">
+            <input
+              nbInput
+              fullWidth
+              name="password"
+              type="password"
+              [(ngModel)]="user.password"
+              placeholder="haslo"
+            />
+          </div>
+
+          <button nbButton fullWidth status="success">ZALOGUJ</button>
+        </form>
+      </div></nb-card-body
+    >
+  </nb-card>
+
+  <nb-card style="width:80vw">
+    <nb-card-body *ngIf="loggedAs"
+      ><div style="color:lime">
+        <b>{{ loggedAs }}</b>
+        <div class="space" style="float:right">
+          <button (click)="logout()" nbButton size="xsmall" status="success">
+            WYLOGUJ
+          </button>
+        </div>
+      </div>
+    </nb-card-body>
+  </nb-card>
+</div>
+<div class="row">
+  <nb-card style="width:100%"> <nb-card-body> </nb-card-body> </nb-card>
+</div>
