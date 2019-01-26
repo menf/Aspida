@@ -1,0 +1,37 @@
+@import "~@nebular/theme/styles/theming";
+@import "~@nebular/theme/styles/themes/default";
+
+$nb-themes: nb-register-theme(
+  (
+    // tutaj zmienianie variables
+
+      color-primary: #40dc7e,
+    // btn-primary-bg: #464242,
+
+      layout-bg: #f5f7fa,
+    sidebar-fg: #ffffff,
+    sidebar-bg: #363636,
+    menu-font-family: Source Sans Pro,
+    menu-font-size: 0.9rem,
+    menu-font-weight: 400,
+    menu-active-font-weight: 400,
+    menu-item-separator: #363636,
+    menu-fg: #ffffff,
+    menu-bg: #363636,
+    menu-active-fg: #ffffff,
+    menu-active-bg: #2ecc71,
+    menu-submenu-fg: #ffffff,
+    menu-submenu-bg: #363636,
+    menu-submenu-active-bg: #2ecc71,
+    menu-submenu-active-fg: #ffffff,
+    menu-submenu-hover-bg: #2ecc71,
+    menu-submenu-item-border-radius: 0,
+    menu-item-border-radius: 0,
+    btn-outline-hover-fg: #4b4b4b,
+    btn-outline-focus-fg: #4b4b4b,
+    btn-outline-fg: #4b4b4b,
+    smart-table-header-fg: #ffffff
+  ),
+  default,
+  default
+);

@@ -1,0 +1,39 @@
+:host ::ng-deep .ngx-datatable .datatable-body .datatable-scroll {
+  display: inherit;
+  font-size: 14px;
+}
+:host ::ng-deep .ngx-datatable {
+  width: 100vw;
+}
+:host ::ng-deep .datatable-header-cell {
+  &:first-of-type {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+  }
+  &:last-of-type {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+  a,
+  div {
+    font-size: 14px;
+    color: #ffffff;
+  }
+  border: none;
+  background: #363636;
+}
+:host ::ng-deep .datatable-body-cell {
+  :not(i) {
+    font-size: 14px;
+  }
+  &:first-of-type {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-left: 2px solid #f5f7fa;
+  }
+  &:last-of-type {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-right: 2px solid #f5f7fa;
+  }
+}

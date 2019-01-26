@@ -1,0 +1,55 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@nebular/theme/styles/globals";
+@import "./themes.scss";
+@import "~@nebular/bootstrap/styles/globals";
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+.cdk-global-scrollblock {
+  position: static;
+  overflow: hidden !important;
+}
+.btn-outline.btn-primary:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 2px solid #40dc7e !important;
+}
+.btn-outline.btn-primary:hover {
+  background-color: transparent !important;
+}
+.btn-outline.btn-primary {
+  border: 2px solid #dadfe6 !important;
+}
+.ng2-smart-actions {
+  ng2-st-tbody-edit-delete {
+    display: none !important;
+  }
+  ng2-st-tbody-custom {
+    display: flex;
+    border: none !important;
+  }
+}
+.content {
+}
+nb-accordion nb-accordion-item-body .item-body {
+  padding: 0 !important;
+}
+nb-list-item {
+  padding: 0 !important;
+}
+a:not([href]):not([tabindex]) {
+  color: #2ecc71 !important;
+  text-decoration: none;
+  :hover {
+    color: #66ec9f;
+  }
+}
+a.disabled.ng-star-inserted {
+  color: #52bb7c !important;
+  opacity: 0.3;
+  :hover {
+    color: #52bb7c !important;
+  }
+}
+@include nb-install() {
+  @include nb-theme-global();
+  @include nb-bootstrap-global();
+}
