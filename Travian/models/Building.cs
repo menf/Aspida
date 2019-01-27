@@ -12,6 +12,29 @@ namespace Travian.models
         private string[] Level20 = { "Cropland", "Iron Mine", "Clay Pit", "Woodcutter", "Marketplace", "Granary", "Rally Point", "Earth Wall", "Marketplace", "Smithy", "Heromansion", "Main Building" };
         private string[] Level10 = { "Warehouse", "Academy", "Treasury", "Cranny" };
         private string[] LevelUnkown = { "Residence", "Embassy" };
+        public List<string> resources;
+        public string name = "";
+        public string duration = "";
+        public string url = "";
+        public string upgradeUrl = "";
+       // public string[] unitsUrl = new string[20];
+        public string level = "";
+        public string maxLevel = "";
+        public string id = "";
+        private string buildDuration = "";
 
+        public Building(string name, string level, string buildDuration)
+        {
+            this.name = name;
+            this.level = level;
+            this.buildDuration = buildDuration;
+        }
+        public Building(string name, string level, string url,List<string> resources)
+        {
+            this.name = name;
+            this.level = level;
+            this.url = url;
+            this.resources = resources;
+        }
     }
 }

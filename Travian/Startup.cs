@@ -1,15 +1,11 @@
 ﻿using Microsoft.Owin.Cors;
 using Owin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
-
+using Hangfire;
+using Hangfire.MemoryStorage;
 namespace Travian
 {
-   
+
     public class Startup 
     { 
         // This code configures Web API. The Startup class is specified as a type
@@ -24,8 +20,13 @@ namespace Travian
                 routeTemplate: "api/{controller}/{id}", 
                 defaults: new { id = RouteParameter.Optional } 
             );
-           
             appBuilder.UseCors(CorsOptions.AllowAll);
+            GlobalConfiguration.Configuration
+               .UseMemoryStorage();
+
+            appBuilder.UseHangfireDashboard();
+            appBuilder.UseHangfireServer();
+
             appBuilder.UseWebApi(config); 
         } 
     } 

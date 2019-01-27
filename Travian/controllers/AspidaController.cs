@@ -8,15 +8,23 @@ namespace Travian.controllers
 {
    
     public class AspidaController : ApiController
-    {   [Route("login")]
-        public string Get(string login, string password)
+    {[Route("login")]
+        [HttpGet]
+        public string Login(string login, string password, string world)
         {
+            Console.WriteLine("Logowanie");
            var c = RestClient.Instance;
-            return c.Login(login,password);
+            return c.Login(login, password, world);
+               
+
         }
-        public string Get(int id)
+
+        [Route("villagepage")]
+        [HttpGet]
+        public string VillagePage()
         {
-            return "value";
+            var c = RestClient.Instance;
+            return "sd";
         }
     }
 }

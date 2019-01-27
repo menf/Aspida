@@ -9,16 +9,21 @@ import { RestclientService } from "src/app/restclient.service";
 export class DashboardComponent implements OnInit {
   constructor(private rest: RestclientService) {}
   loggedAs: string;
+
   user = {
     login: "",
-    password: ""
+    password: "",
+    selectedWorld: ""
   };
-
+  sel(e) {
+    console.log(e);
+  }
   login() {
     this.rest
       .connect(
         this.user.login,
-        this.user.password
+        this.user.password,
+        this.user.selectedWorld
       )
       .subscribe(val => {
         console.log(val);

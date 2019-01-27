@@ -36,9 +36,17 @@ export class RestclientService {
     let body = res;
     return body || {};
   }
-  connect(login, password): Observable<any> {
+  connect(login, password, world): Observable<any> {
     return this.http
-      .get(endpoint + "login?login=" + login + "&password=" + password)
+      .get(
+        endpoint +
+          "login?login=" +
+          login +
+          "&password=" +
+          password +
+          "&world=" +
+          world
+      )
       .pipe(map(this.extractData));
   }
 }

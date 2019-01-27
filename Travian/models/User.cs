@@ -14,10 +14,11 @@ namespace Travian
        new Lazy<User>(() => new User());
         public static User Instance { get { return user.Value; } }
 
+        public List<Village> Villages { get => villages; set => villages = value; }
 
         public string login;
         public string password;
-        public Dictionary<string, Village> villages = new Dictionary<string, Village>();
+        private List<Village> villages = new List<Village>();
         public Dictionary<string, Adventure> adventures = new Dictionary<string, Adventure>();
         private User()
         {

@@ -24,7 +24,36 @@
               placeholder="haslo"
             />
           </div>
-
+          <div class="form-control-group">
+            <nb-select
+              name="world"
+              placeholder="ŚWIAT"
+              [(ngModel)]="user.selectedWorld"
+              (selectedChange)="sel($event)"
+            >
+              <nb-option value="http://www.x10.aspidanetwork.com"
+                >x10</nb-option
+              >
+              <nb-option value="http://www.x1000.aspidanetwork.com"
+                >x1k</nb-option
+              >
+              <nb-option value="http://www.x10000.aspidanetwork.com"
+                >x10k</nb-option
+              >
+              <nb-option value="http://www.x50000.aspidanetwork.com"
+                >x50k</nb-option
+              >
+              <nb-option value="http://www.x1000000.aspidanetwork.com"
+                >x1kk</nb-option
+              >
+              <nb-option value="http://www.x5000000.aspidanetwork.com"
+                >x5kk</nb-option
+              >
+              <nb-option value="http://www.x10000000.aspidanetwork.com"
+                >x10kk</nb-option
+              >
+            </nb-select>
+          </div>
           <button nbButton fullWidth status="success">ZALOGUJ</button>
         </form>
       </div></nb-card-body
