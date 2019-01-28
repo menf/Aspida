@@ -14,17 +14,15 @@ namespace Travian.controllers
         {
             Console.WriteLine("Logowanie");
            var c = RestClient.Instance;
-            return c.Login(login, password, world);
-               
-
+            return c.Login(login, password, world);             
         }
 
-        [Route("villagepage")]
+        [Route("refresh")]
         [HttpGet]
-        public string VillagePage()
+        public string RefreshData()
         {
             var c = RestClient.Instance;
-            return "sd";
+            return c.Refresh();
         }
     }
 }

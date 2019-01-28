@@ -9,12 +9,16 @@ namespace Travian.models
     class Village
     {
         public string id="";
-        public string href = "";
-        public bool active;
-        public List<Building> buildings = new List<Building>();
         public string name = "";
         public string x = "";
         public string y = "";
+        public string href = "";
+        public bool active;
+        public List<string> resources = new List<string>();
+        public List<Unit> units = new List<Unit>();
+        public List<Building> buildings = new List<Building>();
+        public List<Building> buildingsQueue = new List<Building>();
+
 
         public Village(string id, string href, bool active, string name, string x, string y)
         {

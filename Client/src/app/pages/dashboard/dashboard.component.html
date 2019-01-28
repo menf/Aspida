@@ -76,6 +76,19 @@
 
 <div *ngIf="data">
   <div class="row">
+    <div class="row" style="width:33%">
+      <nb-card style="width:100%">
+        <nb-card-header> Logi </nb-card-header>
+        <nb-card-body>
+          <nb-list>
+            <nb-list-item *ngFor="let message of messages2">
+              {{ message }}
+            </nb-list-item>
+          </nb-list>
+        </nb-card-body>
+      </nb-card>
+    </div>
+
     <nb-card style="width:100%">
       <nb-card-header> Wioski </nb-card-header>
 
@@ -83,7 +96,7 @@
         <nb-tabset>
           <nb-tab
             tabTitle="{{ item.name + ' (' + item.x + ':' + item.y + ')' }}"
-            *ngFor="let item of data"
+            *ngFor="let item of data.Villages"
           >
             <div style="width:30%;margin-top:1rem">
               <ng2-smart-table
@@ -91,7 +104,7 @@
                 [source]="item.buildings"
               ></ng2-smart-table>
             </div>
-            <div></div>
+            <div>sdsd</div>
           </nb-tab>
         </nb-tabset>
       </nb-card-body>

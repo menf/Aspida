@@ -8,16 +8,24 @@ namespace Travian.models
 {
     class Unit
     {
-        public int id; 
-    public string title;
-    public bool available;
-    public Building building;
+        public string id; 
+        public string name;
+        public string count;
+        public Building building;
 
-        public Unit(int id, string title, bool available, Building building)
+
+        public Unit(string id, string name, string count)
         {
             this.id = id;
-            this.title = title;
-            this.available = available;
+            this.name = name;
+            this.count = count;
+        }
+
+        public Unit(string id, string name, string count, Building building)
+        {
+            this.id = id;
+            this.name = name;
+            this.count = count;
             this.building = building;
         }
     }

@@ -1,15 +1,29 @@
-import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ElementRef
+} from "@angular/core";
 import { RestclientService } from "src/app/restclient.service";
+import { interval } from "rxjs";
+import { flatMap } from "rxjs/operators";
 
 @Component({
   selector: "ngx-dashboard",
   templateUrl: "./dashboard.component.html",
   styleUrls: ["./dashboard.component.scss"]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
+  ngOnDestroy(): void {
+    clearInterval(this.intervalId);
+  }
   constructor(private rest: RestclientService) {}
   loggedAs: string;
   data;
+  messages = [];
+  messages2 = [];
+  intervalId;
   user = {
     login: "",
     password: "",
@@ -50,12 +64,22 @@ export class DashboardComponent implements OnInit {
       )
       .subscribe(val => {
         this.data = JSON.parse(val);
-
+        console.log(this.data);
+        this.data.messages.forEach(element => {
+          this.messages.push(element);
+        });
+        this.messages2 = null;
+        this.messages2 = this.messages;
         this.loggedAs = "Zalogowano";
+        this.intervalId = interval(15 * 1000)
+          .pipe(flatMap(() => this.rest.refresh()))
+          .subscribe(data => console.log(data));
       });
   }
   logout() {
     this.loggedAs = null;
+    this.data = null;
+    clearInterval(this.intervalId);
   }
   ngOnInit() {}
 }

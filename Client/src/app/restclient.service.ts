@@ -49,4 +49,8 @@ export class RestclientService {
       )
       .pipe(map(this.extractData));
   }
+
+  refresh(): Observable<any> {
+    return this.http.get(endpoint + "refresh").pipe(map(this.extractData));
+  }
 }

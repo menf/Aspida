@@ -60,9 +60,14 @@ class RestClient
                 doc.LoadHtml(content);
                 var user= User.Instance;
                 user.SetUser(login, password);
-                Console.WriteLine("Login OK : "+ Program.GetUserName(doc));
+                user.messages.Add("Logowanie...");
+                var msg = "Login OK : " + Program.GetUserName(doc);
+                user.messages.Add(msg);
+                Console.WriteLine(msg);
                 GetPlayerInfo();
-                return JsonConvert.SerializeObject(user.Villages);
+                var res = JsonConvert.SerializeObject(user);
+                user.ResetMessages();
+                return res;
             }
             return "";
         }
@@ -259,18 +264,44 @@ class RestClient
                     {
                         _village.active = false;
                     }
-                    village.active = true;
-                    Console.WriteLine("Active village: " + village.name);
+                    village.active = true;;
                 }
-
+                user.messages.Add("Sprawdzam wioske: " + village.name);
                 var resourcesPage = GetResourcePage();
                 var villagePage = GetVillagePage();
+
+                List<string> resourcesVillage = new List<string>();
+                List<Unit> units = new List<Unit>();
                 List<Building> buildingQueue = new List<Building>();
                 List<Building> buildings = new List<Building>();
-                HtmlNodeCollection nodes = resourcesPage.DocumentNode.SelectNodes("//*[@id=\"content\"]/div[2]/div[10]/ul");
-                if (nodes !=null)
+
+                user.messages.Add("Pobieram surowce");
+                resourcesVillage.Add(resourcesPage.DocumentNode.SelectSingleNode("//*[@id=\"l1\"]").InnerHtml);
+                resourcesVillage.Add(resourcesPage.DocumentNode.SelectSingleNode("//*[@id=\"l2\"]").InnerHtml);
+                resourcesVillage.Add(resourcesPage.DocumentNode.SelectSingleNode("//*[@id=\"l3\"]").InnerHtml);
+                resourcesVillage.Add(resourcesPage.DocumentNode.SelectSingleNode("//*[@id=\"l4\"]").InnerHtml);
+                village.resources = resourcesVillage;
+
+                user.messages.Add("Pobieram wojsko");
+                HtmlNodeCollection unitsNode = resourcesPage.DocumentNode.SelectNodes("//*[@id=\"troops\"]/tbody");              
+                if (unitsNode!=null)
                 {
-                    var _buildingQueue = nodes[0].ChildNodes;
+                    var unitNodes = unitsNode[0].Descendants("tr");
+                    foreach (var _node in unitNodes)
+                    {
+                        var count = _node.ChildNodes[1].InnerHtml;
+                        var name = _node.ChildNodes[2].InnerHtml;
+                        var id = _node.ChildNodes[0].ChildNodes[0].ChildNodes[0].Attributes[0].Value.Replace("unit", "").Replace('u', 't').Trim();
+                        units.Add(new Unit(id, name, count));
+                    }
+                    village.units = units;
+                }
+
+                user.messages.Add("Pobieram kolejke budowy");
+                HtmlNodeCollection buildingQueueNode = resourcesPage.DocumentNode.SelectNodes("//*[@id=\"content\"]/div[2]/div[10]/ul");
+                if (buildingQueueNode != null)
+                {
+                    var _buildingQueue = buildingQueueNode[0].ChildNodes;
 
                     foreach (var el in _buildingQueue)
                     {
@@ -280,11 +311,13 @@ class RestClient
                         Building b = new Building(name, level, buildDuration);
                         buildingQueue.Add(b);
                     }
+                    village.buildingsQueue = buildingQueue;
                 }
-               
-                HtmlNodeCollection nodes2 = resourcesPage.DocumentNode.SelectNodes("//*[@id=\"rx\"]");
+
+                user.messages.Add("Pobieram pola surowcow");
+                HtmlNodeCollection resourcesNode = resourcesPage.DocumentNode.SelectNodes("//*[@id=\"rx\"]");
               
-                foreach (var el in nodes2[0].ChildNodes)
+                foreach (var el in resourcesNode[0].ChildNodes)
                 {
                     if (el.Name == "area")
                     {
@@ -292,7 +325,7 @@ class RestClient
                         string id = href.Replace("build.php?id=", "");
                         string title = el.GetAttributeValue("title", null);
                         string name,level;
-                        List<string> resources = new List<string>();
+                        List<string> _resources = new List<string>();
                         if (title!=null && title !="buildings")
                         {
                             var doc = new HtmlDocument();
@@ -309,16 +342,18 @@ class RestClient
                             {
                                 if (node.Name == "span")
                                 {
-                                    resources.Add(node.InnerText.Trim(' '));
+                                    _resources.Add(node.InnerText.Trim(' '));
                                 }
                             }
-                            buildings.Add(new Building(id,name, level, href, resources));
+                            buildings.Add(new Building(id,name, level, href, _resources));
                         }
                         
  
                     }
                 }
 
+
+                user.messages.Add("Pobieram budynki");
                 HtmlNodeCollection nodes3 = villagePage.DocumentNode.SelectNodes("//*[@id=\"clickareas\"]");
                 var nodes4 = villagePage.DocumentNode.Descendants("img").Where(d => d.GetAttributeValue("class", "").Contains("building"));
                 HtmlNodeCollection nodes5 = villagePage.DocumentNode.SelectNodes("//*[@id=\"village_map\"]");
@@ -331,7 +366,7 @@ class RestClient
                         string id = href.Replace("build.php?id=", "");
                         string title = el.GetAttributeValue("title", null);
                         string name, level="max";
-                        List<string> resources = new List<string>();
+                        List<string> _resources = new List<string>();
 
                         if (id == "39" )
                         {
@@ -369,21 +404,14 @@ class RestClient
                                 {
                                     if (node.Name == "span")
                                     {
-                                        resources.Add(node.InnerText.Trim(' '));
+                                        _resources.Add(node.InnerText.Trim(' '));
                                     }
                                 }
                             }
                         }
-
-                            buildings.Add(new Building(id, name, level, href, resources));
-                        
-
-
+                            buildings.Add(new Building(id, name, level, href, _resources));                     
                     }
                 }
-
-
-
                 village.buildings = buildings;
             }
         }
@@ -421,64 +449,29 @@ class RestClient
             }
             return villages;
         }
-
-        private string GetBuildingName(string id)
+        public void AutoUpgrade()
         {
-            switch (id)
+            var user = User.Instance;
+            user.messages.Add("Rozpoczynam automatyczną rozbudowe");
+            UpgradeVillages(ref user);
+        }
+        public void UpgradeVillages(ref User user)
+        {
+            foreach (Village village in user.Villages)
             {
-                case "19":
-                    return "g26";
-                    break;
-                case "20":
-                    return "g10";
-                    break;
-                case "21":
-                    return "g11";
-                    break;
-                case "22":
-                    return "g41";
-                    break;
-                case "24":
-                    return "g24";
-                    break;
-                case "25":
-                    return "g14";
-                    break;
-                case "27":
-                    return "g17";
-                    break;
-                case "28":
-                    return "g18";
-                    break;
-                case "29":
-                    return "g21";
-                    break;
-                case "30":
-                    return "g20";
-                    break;
-                case "32":
-                    return "g19";
-                    break;
-                case "33":
-                    return "g12";
-                    break;
-                case "34":
-                    return "g7";
-                    break;
-                case "35":
-                    return "g6";
-                    break;
-                case "36":
-                    return "g22";
-                    break;
-                case "38":
-                    return "g8";
-                    break;
-                case "39":
-                    return "g16";
-                    break;
-                default: return "";
+
+
             }
+        }
+        public string Refresh()
+        {
+            var user = User.Instance;
+            user.messages.Add("Odswiezanie danych");
+            Console.WriteLine("Odswiezanie danych");
+            GetPlayerInfo();
+            var res = JsonConvert.SerializeObject(user);
+            user.ResetMessages();
+            return res;
         }
         #endregion
 
