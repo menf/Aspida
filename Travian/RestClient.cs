@@ -298,7 +298,13 @@ class RestClient
                             var doc = new HtmlDocument();
                             doc.LoadHtml(title);
                             name = doc.DocumentNode.ChildNodes[0].ChildNodes[0].InnerHtml;
-                            level = doc.DocumentNode.ChildNodes[0].ChildNodes[1].InnerHtml.Replace("level ","");
+
+                            if(name == "The field is in the maximum level")
+                            {
+                                level = "max";
+
+                            }
+                           else level = doc.DocumentNode.ChildNodes[0].ChildNodes[1].InnerHtml.Replace("level ","");
                             foreach (var node in doc.DocumentNode.ChildNodes)
                             {
                                 if (node.Name == "span")
@@ -306,12 +312,78 @@ class RestClient
                                     resources.Add(node.InnerText.Trim(' '));
                                 }
                             }
-                            buildings.Add(new Building(name, level, href, resources));
+                            buildings.Add(new Building(id,name, level, href, resources));
                         }
                         
  
                     }
                 }
+
+                HtmlNodeCollection nodes3 = villagePage.DocumentNode.SelectNodes("//*[@id=\"clickareas\"]");
+                var nodes4 = villagePage.DocumentNode.Descendants("img").Where(d => d.GetAttributeValue("class", "").Contains("building"));
+                HtmlNodeCollection nodes5 = villagePage.DocumentNode.SelectNodes("//*[@id=\"village_map\"]");
+                var ss =nodes5[0].SelectNodes("//img");
+                foreach (var el in nodes3[0].ChildNodes)
+                {
+                    if (el.Name == "area")
+                    {
+                        string href = el.GetAttributeValue("href", "");
+                        string id = href.Replace("build.php?id=", "");
+                        string title = el.GetAttributeValue("title", null);
+                        string name, level="max";
+                        List<string> resources = new List<string>();
+
+                        if (id == "39" )
+                        {
+                            var _name = villagePage.DocumentNode.Descendants("img").Where(d => d.GetAttributeValue("class", "").Contains("dx1"));
+                          //  _name.ElementAt(0).GetAttributeValue("alt", "").Split(new[] { " Level " }, StringSplitOptions.None);
+                            name = "Rally Point";
+                        }
+                      else  if (id == "40")
+                        {
+                            var node = villagePage.DocumentNode.Descendants("img").Where(d => d.GetAttributeValue("class", "").Contains("wall"));
+
+                            if (node.Any())
+                            {
+                                var _name = node.ElementAt(0).GetAttributeValue("alt", "").Split(' ');
+                                name = _name[0] + " " + _name[1];
+                                level = _name[3];
+                            }
+                            else { name = "City Wall"; level = "0"; }
+                        }
+                        else
+                        {
+
+                            var _name = nodes4.ElementAt(int.Parse(id) - 19).GetAttributeValue("alt", "").Split(new[] { " Level " }, StringSplitOptions.None);
+
+                            name = _name[0];
+                            level = _name.Length>1 ? _name[1]:"max";
+                            if (title != null && title != "buildings" &&title != "Building is fully upgraded")
+                            {
+
+                                var doc = new HtmlDocument();
+                                doc.LoadHtml(title);
+
+
+                                foreach (var node in doc.DocumentNode.ChildNodes)
+                                {
+                                    if (node.Name == "span")
+                                    {
+                                        resources.Add(node.InnerText.Trim(' '));
+                                    }
+                                }
+                            }
+                        }
+
+                            buildings.Add(new Building(id, name, level, href, resources));
+                        
+
+
+                    }
+                }
+
+
+
                 village.buildings = buildings;
             }
         }

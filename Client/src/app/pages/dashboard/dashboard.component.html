@@ -73,6 +73,28 @@
     </nb-card-body>
   </nb-card>
 </div>
-<div class="row">
-  <nb-card style="width:100%"> <nb-card-body> </nb-card-body> </nb-card>
+
+<div *ngIf="data">
+  <div class="row">
+    <nb-card style="width:100%">
+      <nb-card-header> Wioski </nb-card-header>
+
+      <nb-card-body>
+        <nb-tabset>
+          <nb-tab
+            tabTitle="{{ item.name + ' (' + item.x + ':' + item.y + ')' }}"
+            *ngFor="let item of data"
+          >
+            <div style="width:30%;margin-top:1rem">
+              <ng2-smart-table
+                [settings]="settings"
+                [source]="item.buildings"
+              ></ng2-smart-table>
+            </div>
+            <div></div>
+          </nb-tab>
+        </nb-tabset>
+      </nb-card-body>
+    </nb-card>
+  </div>
 </div>

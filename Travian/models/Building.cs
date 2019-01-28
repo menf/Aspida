@@ -29,12 +29,21 @@ namespace Travian.models
             this.level = level;
             this.buildDuration = buildDuration;
         }
-        public Building(string name, string level, string url,List<string> resources)
+        public Building(string id,string name, string level, string url,List<string> resources)
         {
+            this.id = id;
             this.name = name;
             this.level = level;
             this.url = url;
             this.resources = resources;
+            SetMaxLevel();
+        }
+
+        private void SetMaxLevel()
+        {
+            if (Level20.Contains(name)) maxLevel = "20";
+            else if (Level10.Contains(name)) maxLevel = "10";
+            else maxLevel = "varies";
         }
     }
 }

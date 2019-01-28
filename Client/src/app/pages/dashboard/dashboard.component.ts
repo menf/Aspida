@@ -9,11 +9,34 @@ import { RestclientService } from "src/app/restclient.service";
 export class DashboardComponent implements OnInit {
   constructor(private rest: RestclientService) {}
   loggedAs: string;
-
+  data;
   user = {
     login: "",
     password: "",
     selectedWorld: ""
+  };
+  settings = {
+    hideSubHeader: true,
+    columns: {
+      id: {
+        title: "ID"
+      },
+      name: {
+        title: "Nazwa"
+      },
+      level: {
+        title: "Poziom"
+      },
+      maxlevel: {
+        title: "Maksymalny poziom"
+      },
+      duration: {
+        title: "Czas ulepszenia"
+      },
+      resources: {
+        title: "Koszt ulepszenia"
+      }
+    }
   };
   sel(e) {
     console.log(e);
@@ -26,12 +49,33 @@ export class DashboardComponent implements OnInit {
         this.user.selectedWorld
       )
       .subscribe(val => {
-        console.log(val);
-        this.loggedAs = val;
+        this.data = JSON.parse(val);
+
+        this.loggedAs = "Zalogowano";
       });
   }
   logout() {
     this.loggedAs = null;
   }
   ngOnInit() {}
+}
+export interface Building {
+  resources: string[];
+  name: string;
+  duration: string;
+  url: string;
+  upgradeUrl: string;
+  level: string;
+  maxLevel: string;
+  id: string;
+}
+
+export interface Village {
+  id: string;
+  href: string;
+  active: boolean;
+  buildings: Building[];
+  name: string;
+  x: string;
+  y: string;
 }
