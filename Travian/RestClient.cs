@@ -4,6 +4,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Travian.models;
@@ -14,18 +15,11 @@ namespace Travian
 
 class RestClient
     {
-        private enum BuildingsCategories
-        {
-            INFRASTRUCTURE = 1,
-            MILITARY = 2,
-            RESOURCES = 3
-        }
+
         private string serverUrl = "";
         private string resourceUrl = "dorf1.php";
         private string villageUrl = "dorf2.php";
-        private string buildUrl = "build.php?";
-        private string adventureUrl = "hero_adventure.php";
-        private string adventureStart = "a2b.php";
+        private string buildUrl = "build.php";
         private RestSharp.RestClient client;
 
 
@@ -113,6 +107,8 @@ class RestClient
             }
             return null;
         }
+
+
         public HtmlDocument GetResourcePage()
         {
             var request = new RestSharp.RestRequest(resourceUrl, Method.GET);
@@ -129,19 +125,7 @@ class RestClient
             }
             return null;
         }
-        public HtmlDocument GetAdventuresPage()
-        {
-            var request = new RestSharp.RestRequest(adventureUrl, Method.GET);
-            IRestResponse response = client.Execute(request);
-            if (response.IsSuccessful)
-            {
-                var content = response.Content; // raw content as string
-                var doc = new HtmlAgilityPack.HtmlDocument();
-                doc.LoadHtml(content);
-                return doc;
-            }
-            return null;
-        }
+
         public HtmlDocument GetBuildingPage(string id)
         {
             var request = new RestSharp.RestRequest(buildUrl, Method.GET);
@@ -287,14 +271,20 @@ class RestClient
                 if (unitsNode!=null)
                 {
                     var unitNodes = unitsNode[0].Descendants("tr");
-                    foreach (var _node in unitNodes)
+                    if (unitNodes.ElementAt(0).ChildNodes[0].InnerHtml != "None")
                     {
-                        var count = _node.ChildNodes[1].InnerHtml;
-                        var name = _node.ChildNodes[2].InnerHtml;
-                        var id = _node.ChildNodes[0].ChildNodes[0].ChildNodes[0].Attributes[0].Value.Replace("unit", "").Replace('u', 't').Trim();
-                        units.Add(new Unit(id, name, count));
+                        foreach (var _node in unitNodes)
+                        {
+
+                            var count = _node.ChildNodes[1].InnerHtml;
+                            var name = _node.ChildNodes[2].InnerHtml;
+                            var id = _node.ChildNodes[0].ChildNodes[0].ChildNodes[0].Attributes[0].Value.Replace("unit", "").Replace('u', 't').Trim();
+                            if (id == "thero") id = "t11";
+                            units.Add(new Unit(id, name, count));
+                        }
+                        village.units = units;
                     }
-                    village.units = units;
+
                 }
 
                 user.messages.Add("Pobieram kolejke budowy");
@@ -434,7 +424,7 @@ class RestClient
                     var x1 = node.ChildNodes[1].ChildNodes[5].ChildNodes[0].InnerHtml;
                     var y1 = node.ChildNodes[1].ChildNodes[5].ChildNodes[2].InnerHtml;
                     var x = x1.Substring(1);
-                    var y = y1.Substring(0, 2);
+                    var y = y1.Replace(")","");
                     var active = false;
                     foreach (var att in node.Attributes)
                     {
@@ -461,6 +451,107 @@ class RestClient
             {
 
 
+            }
+        }
+        public void SendResources(ResourceBody model)
+        {
+            
+            var request = new RestSharp.RestRequest(buildUrl, Method.POST);
+            request.AddParameter("ft", "check"); // adds to POST or URL querystring based on Method
+            request.AddParameter("id", model.id); // adds to POST or URL querystring based on Method
+            request.AddParameter("r1", model.r1); // adds to POST or URL querystring based on Method
+            request.AddParameter("r2", model.r2); // adds to POST or URL querystring based on Method
+            request.AddParameter("r3", model.r3); // adds to POST or URL querystring based on Method
+            request.AddParameter("r4", model.r4); // adds to POST or URL querystring based on Method
+            request.AddParameter("x", model.x); // adds to POST or URL querystring based on Method
+            request.AddParameter("y", model.y); // adds to POST or URL querystring based on Method
+            request.AddParameter("send3", "1"); // adds to POST or URL querystring based on Method
+            request.AddParameter("s1", "ok"); // adds to POST or URL querystring based on Method
+
+            var user = User.Instance;
+            
+            var xxx = GetVillagePage(model.villageid);
+            user.messages.Add("Wysyłam surowce");
+            IRestResponse response = client.Execute(request);
+            if (response.IsSuccessful)
+            {
+                var content = response.Content; // raw content as string
+                var doc = new HtmlAgilityPack.HtmlDocument();
+                doc.LoadHtml(content);
+                var node = doc.DocumentNode.SelectSingleNode("//*[@id=\"build\"]/form/input[4]");
+
+                if (node != null)
+                {
+                    var request2 = new RestSharp.RestRequest(buildUrl, Method.POST);
+                    request2.AddParameter("ft", "mk1"); // adds to POST or URL querystring based on Method
+                    request2.AddParameter("id", model.id); // adds to POST or URL querystring based on Method
+                    request2.AddParameter("r1", model.r1); // adds to POST or URL querystring based on Method
+                    request2.AddParameter("r2", model.r2); // adds to POST or URL querystring based on Method
+                    request2.AddParameter("r3", model.r3); // adds to POST or URL querystring based on Method
+                    request2.AddParameter("r4", model.r4); // adds to POST or URL querystring based on Method
+                    request2.AddParameter("x", model.x); // adds to POST or URL querystring based on Method
+                    request2.AddParameter("y", model.y); // adds to POST or URL querystring based on Method
+                    request2.AddParameter("send3", "1"); // adds to POST or URL querystring based on Method
+                    request2.AddParameter("s1", "ok"); // adds to POST or URL querystring based on Method
+                    request2.AddParameter("getwref", node.Attributes[2].Value); // adds to POST or URL querystring based on Method
+                    user.messages.Add("Wysyłam surowce..");
+                    IRestResponse response2 = client.Execute(request2);
+                    if (response.IsSuccessful)
+                    {
+                        user.messages.Add("Wysyłano surowce");
+                        content = response.Content; // raw content as string
+                         doc = new HtmlAgilityPack.HtmlDocument();
+                        doc.LoadHtml(content);
+                        GetVillagePage();
+                    }
+                }
+            }
+        }
+        public void SendTroops(TroopsBody model,string villageid)
+        {
+            var request = new RestSharp.RestRequest("a2b.php", Method.POST);
+            var user = User.Instance;
+            user.messages.Add("Wysyłam wojska");
+            foreach (PropertyInfo propertyInfo in model.GetType().GetProperties())
+            {
+                if (propertyInfo.Name.Contains('t') && propertyInfo.Name!="type" )
+                {
+                    if(propertyInfo.GetValue(model)!=null)
+                    request.AddParameter(propertyInfo.Name, propertyInfo.GetValue(model));
+                }
+            }
+            request.AddParameter("x", model.x); // adds to POST or URL querystring based on Method
+            request.AddParameter("y", model.y); // adds to POST or URL querystring based on Method
+            request.AddParameter("c", model.type); // adds to POST or URL querystring based on Method
+            request.AddParameter("s1", "ok"); // adds to POST or URL querystring based on Method
+            var xxx = GetVillagePage(villageid);
+            IRestResponse response = client.Execute(request);
+            if (response.IsSuccessful)
+            {
+                var content = response.Content; // raw content as string
+                var doc = new HtmlAgilityPack.HtmlDocument();
+                doc.LoadHtml(content);
+                var node = doc.DocumentNode.SelectSingleNode("//*[@id=\"content\"]/form");
+                var _nodes = node.Descendants("input");
+                if (_nodes != null)
+                {
+                    var request2 = new RestSharp.RestRequest("a2b.php", Method.POST);
+                    foreach (var el in _nodes)
+                    {
+                        request2.AddParameter(el.GetAttributeValue("name",""), el.GetAttributeValue("value","")); // adds to POST or URL querystring based on Method
+                    }
+                    user.messages.Add("Wysyłam wojska..");
+                    IRestResponse response2 = client.Execute(request2);
+                    if (response.IsSuccessful)
+                    {
+
+                        user.messages.Add("Wysyłano wojska");
+                        content = response.Content; // raw content as string
+                        doc = new HtmlAgilityPack.HtmlDocument();
+                        doc.LoadHtml(content);
+                        GetVillagePage();
+                    }
+                }
             }
         }
         public string Refresh()

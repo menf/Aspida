@@ -8,7 +8,8 @@ import {
   NbButtonModule,
   NbSelectModule,
   NbTabsetModule,
-  NbListModule
+  NbListModule,
+  NbAccordionModule
 } from "@nebular/theme";
 import { FormsModule } from "@angular/forms";
 
@@ -22,6 +23,7 @@ import { FormsModule } from "@angular/forms";
     NbSelectModule,
     NbTabsetModule,
     NbListModule,
+    NbAccordionModule,
     Ng2SmartTableModule
   ],
   declarations: [DashboardComponent]

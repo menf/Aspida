@@ -9,7 +9,7 @@ namespace Travian.models
 
     class Building
     {
-        private string[] Level20 = { "Cropland", "Iron Mine", "Clay Pit", "Woodcutter", "Marketplace", "Granary", "Rally Point", "Earth Wall", "Marketplace", "Smithy", "Heromansion", "Main Building" };
+        private string[] Level20 = { "City Wall", "Cropland", "Iron Mine", "Clay Pit", "Woodcutter", "Rally Point", "Marketplace", "Granary", "Earth Wall", "Marketplace", "Smithy", "Heromansion", "Main Building" };
         private string[] Level10 = { "Warehouse", "Academy", "Treasury", "Cranny" };
         private string[] LevelUnkown = { "Residence", "Embassy" };
         public List<string> resources;
@@ -27,7 +27,8 @@ namespace Travian.models
         {
             this.name = name;
             this.level = level;
-            this.buildDuration = buildDuration;
+            this.duration = buildDuration;
+            SetMaxLevel();
         }
         public Building(string id,string name, string level, string url,List<string> resources)
         {

@@ -102,6 +102,7 @@
     <Compile Include="models\Adventure.cs" />
     <Compile Include="models\Building.cs" />
     <Compile Include="models\Queue.cs" />
+    <Compile Include="models\ResourceBody.cs" />
     <Compile Include="models\Unit.cs" />
     <Compile Include="models\Village.cs" />
     <Compile Include="Produkcja.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="RestClient.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="models\User.cs" />
+    <Compile Include="models\TroopsBody.cs" />
     <Compile Include="Wioska.cs" />
     <Compile Include="Wioski.cs" />
   </ItemGroup>

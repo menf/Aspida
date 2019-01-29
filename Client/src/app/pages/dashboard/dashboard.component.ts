@@ -3,7 +3,9 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
-  ElementRef
+  ElementRef,
+  ChangeDetectorRef,
+  ChangeDetectionStrategy
 } from "@angular/core";
 import { RestclientService } from "src/app/restclient.service";
 import { interval } from "rxjs";
@@ -12,22 +14,31 @@ import { flatMap } from "rxjs/operators";
 @Component({
   selector: "ngx-dashboard",
   templateUrl: "./dashboard.component.html",
-  styleUrls: ["./dashboard.component.scss"]
+  styleUrls: ["./dashboard.component.scss"],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     clearInterval(this.intervalId);
   }
-  constructor(private rest: RestclientService) {}
+  constructor(private rest: RestclientService, private cd: ChangeDetectorRef) {}
   loggedAs: string;
   data;
+  troops = [];
   messages = [];
-  messages2 = [];
   intervalId;
   user = {
     login: "",
     password: "",
     selectedWorld: ""
+  };
+  surowce = {
+    drewno: "",
+    glina: "",
+    zelazo: "",
+    zboze: "",
+    x: "",
+    y: ""
   };
   settings = {
     hideSubHeader: true,
@@ -41,7 +52,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       level: {
         title: "Poziom"
       },
-      maxlevel: {
+      maxLevel: {
         title: "Maksymalny poziom"
       },
       duration: {
@@ -52,8 +63,45 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     }
   };
+  settingsunits = {
+    hideSubHeader: true,
+    columns: {
+      id: {
+        title: "ID"
+      },
+      name: {
+        title: "Nazwa"
+      },
+      count: {
+        title: "Ilość"
+      }
+    }
+  };
   sel(e) {
     console.log(e);
+  }
+  sendT(val, id) {
+    console.log(val);
+    this.rest.sendTroops(val, id).subscribe(res => {
+      console.log(res);
+    });
+  }
+  sendR(val, villageid) {
+    var id = this.getMarket(val);
+    this.rest
+      .sendResources({
+        villageid: villageid,
+        id: id,
+        r1: this.surowce.drewno,
+        r2: this.surowce.glina,
+        r3: this.surowce.zelazo,
+        r4: this.surowce.zboze,
+        x: this.surowce.x,
+        y: this.surowce.y
+      })
+      .subscribe(res => {
+        console.log(res);
+      });
   }
   login() {
     this.rest
@@ -65,22 +113,54 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .subscribe(val => {
         this.data = JSON.parse(val);
         console.log(this.data);
-        this.data.messages.forEach(element => {
-          this.messages.push(element);
-        });
-        this.messages2 = null;
-        this.messages2 = this.messages;
+        this.messages = [...this.messages, ...this.data.messages];
+        this.cd.markForCheck();
+
         this.loggedAs = "Zalogowano";
-        this.intervalId = interval(15 * 1000)
-          .pipe(flatMap(() => this.rest.refresh()))
-          .subscribe(data => console.log(data));
       });
+  }
+  refresh() {
+    this.rest.refresh().subscribe(data => {
+      this.data = JSON.parse(data);
+      this.messages = [...this.messages, ...this.data.messages];
+      this.cd.markForCheck();
+    });
+  }
+  containsMarket(buildings: []) {
+    var val;
+    var contains = false;
+    for (val of buildings) {
+      if (val.name === "Marketplace") {
+        contains = true;
+      }
+    }
+    return contains;
+  }
+  getMarket(buildings: []) {
+    var val;
+    var id;
+    for (val of buildings) {
+      if (val.name === "Marketplace") {
+        id = val.id;
+      }
+    }
+    return id;
   }
   logout() {
     this.loggedAs = null;
     this.data = null;
     clearInterval(this.intervalId);
+    this.cd.markForCheck();
   }
+  // sd() {
+  //  this.intervalId = interval(500 * 60 * 1000)
+  //    .pipe(flatMap(() => this.rest.refresh()))
+  //    .subscribe(data => {
+  //      this.data = JSON.parse(data);
+  //      this.messages = [...this.messages, ...this.data.messages];
+  //      this.cd.markForCheck();
+  //     });
+  // }
   ngOnInit() {}
 }
 export interface Building {

@@ -53,4 +53,11 @@ export class RestclientService {
   refresh(): Observable<any> {
     return this.http.get(endpoint + "refresh").pipe(map(this.extractData));
   }
+
+  sendResources(body): Observable<any> {
+    return this.http.post(endpoint + "sendResources", body);
+  }
+  sendTroops(body, id): Observable<any> {
+    return this.http.post(endpoint + "sendTroops?v=" + id, body);
+  }
 }

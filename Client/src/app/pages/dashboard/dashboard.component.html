@@ -69,6 +69,11 @@
             WYLOGUJ
           </button>
         </div>
+        <div class="space" style="float:right">
+          <button (click)="refresh()" nbButton size="xsmall" status="success">
+            ODŚWIEŻ
+          </button>
+        </div>
       </div>
     </nb-card-body>
   </nb-card>
@@ -80,33 +85,175 @@
       <nb-card style="width:100%">
         <nb-card-header> Logi </nb-card-header>
         <nb-card-body>
-          <nb-list>
-            <nb-list-item *ngFor="let message of messages2">
+          <nb-list style="height:5rem;">
+            <nb-list-item *ngFor="let message of messages">
               {{ message }}
             </nb-list-item>
           </nb-list>
         </nb-card-body>
       </nb-card>
     </div>
-
-    <nb-card style="width:100%">
-      <nb-card-header> Wioski </nb-card-header>
-
+  </div>
+  <div class="row">
+    <nb-card style="" *ngFor="let item of data.Villages">
+      <nb-card-header>
+        {{ item.name + " (" + item.x + ":" + item.y + ")" }} | Drewno:
+        {{ item.resources[0] }} Glina: {{ item.resources[1] }} Żelazo:
+        {{ item.resources[2] }} Zboże: {{ item.resources[3] }}
+      </nb-card-header>
       <nb-card-body>
-        <nb-tabset>
-          <nb-tab
-            tabTitle="{{ item.name + ' (' + item.x + ':' + item.y + ')' }}"
-            *ngFor="let item of data.Villages"
-          >
-            <div style="width:30%;margin-top:1rem">
+        <nb-accordion>
+          <nb-accordion-item>
+            <nb-accordion-item-header>Budynki</nb-accordion-item-header>
+            <nb-accordion-item-body>
               <ng2-smart-table
                 [settings]="settings"
                 [source]="item.buildings"
               ></ng2-smart-table>
-            </div>
-            <div>sdsd</div>
-          </nb-tab>
-        </nb-tabset>
+            </nb-accordion-item-body>
+          </nb-accordion-item>
+          <nb-accordion-item>
+            <nb-accordion-item-header>Wojsko</nb-accordion-item-header>
+            <nb-accordion-item-body>
+              <ng2-smart-table
+                [settings]="settingsunits"
+                [source]="item.units"
+              ></ng2-smart-table>
+            </nb-accordion-item-body>
+          </nb-accordion-item>
+          <nb-accordion-item *ngIf="item.units.length > 0">
+            <nb-accordion-item-header>Wyślij Wojsko</nb-accordion-item-header>
+            <nb-accordion-item-body>
+              <form
+                #userForm="ngForm"
+                (ngSubmit)="sendT(userForm.value, item.id)"
+              >
+                <div *ngFor="let unit of item.units">
+                  <div class="form-control-group">
+                    <label>{{ unit.name }}</label>
+                    <input
+                      nbInput
+                      fullWidth
+                      min="0"
+                      name="{{ unit.id }}"
+                      max="{{ unit.count }}"
+                      type="number"
+                      ngModel
+                    />
+                  </div>
+                </div>
+                <label>Typ rozkazu</label>
+                <input
+                  nbInput
+                  fullWidth
+                  min="2"
+                  max="4"
+                  name="type"
+                  type="number"
+                  placeholder="2, 3 lub 4"
+                  ngModel
+                />
+                <div class="form-control-group">
+                  <input
+                    nbInput
+                    fullWidth
+                    placeholder="X"
+                    type="number"
+                    name="x"
+                    ngModel
+                  />
+                </div>
+                <div class="form-control-group">
+                  <input
+                    nbInput
+                    fullWidth
+                    placeholder="Y"
+                    type="number"
+                    name="y"
+                    ngModel
+                  />
+                </div>
+                <button nbButton fullWidth status="success">wyślij</button>
+              </form>
+            </nb-accordion-item-body>
+          </nb-accordion-item>
+          <nb-accordion-item *ngIf="containsMarket(item.buildings)">
+            <nb-accordion-item-header>Wyślij surowce</nb-accordion-item-header>
+            <nb-accordion-item-body>
+              <form (ngSubmit)="sendR(item.buildings, item.id)">
+                <div class="form-control-group">
+                  <input
+                    nbInput
+                    fullWidth
+                    [(ngModel)]="surowce.drewno"
+                    placeholder="drewno"
+                    min="1"
+                    max="{{ item.resources[0] }}"
+                    type="number"
+                    name="drewno"
+                  />
+                </div>
+                <div class="form-control-group">
+                  <input
+                    nbInput
+                    fullWidth
+                    [(ngModel)]="surowce.glina"
+                    min="1"
+                    max="{{ item.resources[1] }}"
+                    placeholder="glina"
+                    type="number"
+                    name="glina"
+                  />
+                </div>
+                <div class="form-control-group">
+                  <input
+                    nbInput
+                    fullWidth
+                    [(ngModel)]="surowce.zelazo"
+                    min="1"
+                    max="{{ item.resources[2] }}"
+                    placeholder="zelazo"
+                    type="number"
+                    name="zelazo"
+                  />
+                </div>
+                <div class="form-control-group">
+                  <input
+                    nbInput
+                    fullWidth
+                    [(ngModel)]="surowce.zboze"
+                    min="1"
+                    max="{{ item.resources[3] }}"
+                    placeholder="zboze"
+                    type="number"
+                    name="zboze"
+                  />
+                </div>
+                <div class="form-control-group">
+                  <input
+                    nbInput
+                    fullWidth
+                    [(ngModel)]="surowce.x"
+                    placeholder="X"
+                    type="number"
+                    name="x"
+                  />
+                </div>
+                <div class="form-control-group">
+                  <input
+                    nbInput
+                    fullWidth
+                    [(ngModel)]="surowce.y"
+                    placeholder="Y"
+                    type="number"
+                    name="y"
+                  />
+                </div>
+                <button nbButton fullWidth status="success">wyślij</button>
+              </form>
+            </nb-accordion-item-body>
+          </nb-accordion-item>
+        </nb-accordion>
       </nb-card-body>
     </nb-card>
   </div>
